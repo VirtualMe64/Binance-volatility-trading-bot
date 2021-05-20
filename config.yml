@@ -7,13 +7,13 @@ script_options:
   LOG_FILE: 'trades.txt'
 
   # Set this to true if you're using Binance US
-  BINANCE_US: False
+  BINANCE_US: True
 
 
 # These options apply to the trading methods the script executes
 trading_options:
   # select what to pair the coins to and pull all coins paied with PAIR_WITH
-  PAIR_WITH: USDT
+  PAIR_WITH: USD
 
   # Total ammount per trade
   QUANTITY: 15
@@ -32,19 +32,19 @@ trading_options:
   MAX_COINS: 7
 
   # the amount of time in MINUTES to calculate the difference from the current price
-  TIME_DIFFERENCE: 2
+  TIME_DIFFERENCE: 5
 
   # Numer of times to check for TP/SL during each TIME_DIFFERENCE Minimum 1
-  RECHECK_INTERVAL: 10
+  RECHECK_INTERVAL: 60
 
   # the difference in % between the first and second checks for the price.
-  CHANGE_IN_PRICE: 10
+  CHANGE_IN_PRICE: 3
 
   # define in % when to sell a coin that's not making a profit
-  STOP_LOSS: 2
+  STOP_LOSS: 1
 
   # define in % when to take profit on a profitable coin
-  TAKE_PROFIT: .8
+  TAKE_PROFIT: 2
 
   # Use custom tickers.txt list for filtering pairs
   CUSTOM_LIST: True

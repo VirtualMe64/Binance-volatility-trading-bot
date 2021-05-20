@@ -237,7 +237,7 @@ def convert_volume():
     return volume, last_price
 
 
-def buy():
+def buy(complete_buy = True):
     '''Place Buy market orders for each volatile coin found'''
 
     volume, last_price = convert_volume()
@@ -246,8 +246,8 @@ def buy():
     for coin in volume:
 
         # only buy if the there are no active trades on the coin
-        if coin not in coins_bought:
-            print(f"{txcolors.BUY}Preparing to buy {volume[coin]} {coin}{txcolors.DEFAULT}")
+        if complete_buy and coin not in coins_bought:
+            print(f"{txcolors.BUY}Preparing to buy {volume[coin]} {coin} at ${last_price[coin]['price']}{txcolors.DEFAULT}")
 
             if TEST_MODE:
                 orders[coin] = [{
@@ -356,7 +356,7 @@ def sell_coins():
                 if LOG_TRADES:
                     profit = (LastPrice - BuyPrice) * coins_sold[coin]['volume']
                     write_log(f"Sell: {coins_sold[coin]['volume']} {coin} - {BuyPrice} - {LastPrice} Profit: {profit:.2f} {PriceChange:.2f}%")
-                    session_profit=session_profit + PriceChange
+                    session_profit=session_profit + PriceChange - 0
             continue
 
         # no action; print once every TIME_DIFFERENCE
@@ -483,6 +483,9 @@ if __name__ == '__main__':
         with open(coins_bought_file_path) as file:
                 coins_bought = json.load(file)
 
+    # Boolean for whether to buy coins, allowing sell exit strategy
+    buy_coins = True
+
     print('Press Ctrl-Q to stop the script')
 
     if not TEST_MODE:
@@ -499,7 +502,15 @@ if __name__ == '__main__':
     # seed initial prices
     get_price()
     while True:
-        orders, last_price, volume = buy()
-        update_portfolio(orders, last_price, volume)
-        coins_sold = sell_coins()
-        remove_from_portfolio(coins_sold)
+        try:
+            orders, last_price, volume = buy(buy_coins)
+            update_portfolio(orders, last_price, volume)
+            coins_sold = sell_coins()
+            remove_from_portfolio(coins_sold)
+        except KeyboardInterrupt:
+            exit_strategy = input("Type 'quit' to quit program, 'sell' to continue program without buying: ")
+            if exit_strategy == 'sell':
+                buy_coins = False
+                continue
+            break
+

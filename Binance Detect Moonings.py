@@ -423,6 +423,7 @@ if __name__ == '__main__':
     TEST_MODE = parsed_config['script_options']['TEST_MODE']
     LOG_TRADES = parsed_config['script_options'].get('LOG_TRADES')
     LOG_FILE = parsed_config['script_options'].get('LOG_FILE')
+    BINANCE_US = parsed_config['script_options'].get('BINANCE_US')
     DEBUG_SETTING = parsed_config['script_options'].get('DEBUG')
 
     # Load trading vars
@@ -452,7 +453,7 @@ if __name__ == '__main__':
 
 
     # Authenticate with the client, Ensure API key is good before continuing
-    client = Client(access_key, secret_key)
+    client = Client(access_key, secret_key, tld='us' if BINANCE_US else 'com')
     api_ready, msg = test_api_key(client, BinanceAPIException)
     if api_ready is not True:
         exit(f'{txcolors.SELL_LOSS}{msg}{txcolors.DEFAULT}')
@@ -492,8 +493,8 @@ if __name__ == '__main__':
     # load signalling modules
     for module in SIGNALLING_MODULES:
         mymodule[module] = importlib.import_module(module)
-        t = threading.Thread(target=mymodule[module].do_work, args=())
-        t.start()
+        t = threading.Thread(target=mymodule[module].do_work, args=("signalsample_us.txt",) if BINANCE_US else ())
+        t.start()     
 
     # seed initial prices
     get_price()
